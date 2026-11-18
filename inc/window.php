@@ -286,8 +286,12 @@ function platinum_document_window() {
 		echo '<div><dt>' . esc_html__( 'Subject:', 'platinum' ) . '</dt><dd>' . esc_html__( 'Hello', 'platinum' ) . '</dd></div>';
 		echo '</dl>';
 		echo '<div class="mail-body"><article class="doc doc--mail">';
-		the_content();
-		echo '<p class="mail-privacy">' . esc_html__( 'Your name, email address and message are sent to me and kept on this site so that I can reply. They are checked for spam on the way. Nothing else is collected.', 'platinum' ) . '</p>';
+		$message = str_replace( ']]>', ']]&gt;', apply_filters( 'the_content', get_the_content() ) ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals
+		echo $message; // phpcs:ignore WordPress.Security.EscapeOutput
+		// The note about how details are used only makes sense when there is a form to fill in.
+		if ( false !== stripos( $message, '<form' ) ) {
+			echo '<p class="mail-privacy">' . esc_html__( 'Your name, email address and message are sent to me and kept on this site so that I can reply. They are checked for spam on the way. Nothing else is collected.', 'platinum' ) . '</p>';
+		}
 		echo '</article></div>';
 		echo '</div>';
 	} else {
