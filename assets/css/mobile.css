@@ -1,0 +1,546 @@
+/* Phone layout: an icon grid, and windows that open full screen. */
+
+@media (max-width: 767px) {
+	:root {
+		--bar-h: 44px;
+	}
+
+	body.platinum {
+		font-size: 14px;
+	}
+
+	.menubar {
+		padding: 0 4px;
+	}
+
+	/* Only the site menu stays; its items are the ones that matter on a phone. */
+	.menus .menu:not(.menu--mark),
+	.menu--apps,
+	.strip {
+		display: none;
+	}
+
+	.menu-title {
+		min-width: 44px;
+		justify-content: center;
+	}
+
+	.menu-title .ico,
+	.menu-title .mark {
+		width: 22px;
+		height: 22px;
+	}
+
+	.menu-list {
+		min-width: 230px;
+	}
+
+	.phone-only {
+		display: block;
+	}
+
+	.menu-list a,
+	.menu-list button {
+		padding: 11px 16px;
+		font-size: 15px;
+	}
+
+	.menu-list .ico {
+		width: 22px;
+		height: 22px;
+	}
+
+	.clock {
+		padding: 0 10px;
+		font-size: 14px;
+	}
+
+	.desktop {
+		overflow: auto;
+	}
+
+	.icons {
+		position: static;
+		display: grid;
+		grid-template-columns: repeat(3, minmax(0, 1fr));
+		gap: 14px 6px;
+		padding: 22px 12px calc(28px + env(safe-area-inset-bottom));
+	}
+
+	.icon {
+		width: auto;
+		min-height: 88px;
+		padding: 6px 2px;
+		font-size: 14px;
+	}
+
+	.icon--trash {
+		margin-top: 0;
+	}
+
+	.icons .icon,
+	.files .icon {
+		position: static !important;
+	}
+
+	.files.is-free {
+		display: grid;
+		min-height: 0 !important;
+	}
+
+	.ico {
+		width: 52px;
+		height: 52px;
+	}
+
+	/* One window at a time, filling the screen under the menu bar. */
+	.windows {
+		position: fixed;
+		inset: calc(var(--bar-h) + var(--admin-h)) 0 0 0;
+		z-index: 4000;
+	}
+
+	.windows:not(:has(.window)) {
+		display: none;
+	}
+
+	.window,
+	.window.is-placed {
+		position: absolute;
+		left: 0 !important;
+		top: 0 !important;
+		width: 100% !important;
+		height: 100% !important;
+		max-width: none;
+		max-height: none;
+		padding: 0;
+		border: 0;
+		box-shadow: none;
+		z-index: auto !important;
+	}
+
+	.js .window:not(.is-active) {
+		display: none;
+	}
+
+	.titlebar {
+		height: 44px;
+		padding: 0 10px;
+		gap: 8px;
+		border-bottom: 1px solid var(--ink);
+	}
+
+	.title {
+		font-size: 15px;
+	}
+
+	.stripes {
+		height: 14px;
+	}
+
+	.box-zoom,
+	.box-shade,
+	.grow,
+	.wp-tools,
+	.wp-ruler,
+	.browser-tools,
+	.mail-tools,
+	.mail-boxes,
+	.mail-band,
+	.mail-filter,
+	.mail-list,
+	.mail-status {
+		display: none;
+	}
+
+	/* The word processor keeps its toolbar and fills the screen. */
+	.window[data-app="write"] .box-zoom,
+	.window[data-app="write"] .grow {
+		display: none;
+	}
+
+	.wp-tools.write-tools {
+		display: flex;
+		gap: 6px;
+	}
+
+	.write-tools button.wp-btn,
+	.write-key,
+	.write-style {
+		height: 36px;
+		min-width: 36px;
+		font-size: 14px;
+	}
+
+	.window[data-app="write"],
+	.window[data-app="write"].is-placed {
+		left: 0 !important;
+		top: 0 !important;
+		width: 100% !important;
+		height: 100% !important;
+		max-height: none;
+		transform: none;
+		padding: 0;
+		border: 0;
+	}
+
+	.alert-field input,
+	.alert-field select {
+		min-width: 0;
+		padding: 9px 8px;
+		font-size: 16px;
+	}
+
+	/* The close box becomes a plainly worded Back button, big enough for a thumb. */
+	.box-close {
+		width: auto;
+		height: 30px;
+		display: flex;
+		align-items: center;
+		padding: 0 10px 0 7px;
+		background: linear-gradient(#fff, #ddd 55%, #bbb);
+		border: 1px solid var(--ink);
+		border-radius: 4px;
+		box-shadow: inset 1px 1px 0 var(--plat-hi), inset -1px -1px 0 var(--plat-lo);
+		color: var(--ink);
+		font: 700 13px/1 var(--chrome-font);
+		text-decoration: none;
+		white-space: nowrap;
+	}
+
+	.box-close::after {
+		content: "‹ Back";
+	}
+
+	.window--alert .box-close::after,
+	.window--app .box-close::after {
+		content: "Close";
+	}
+
+	.box-close::before {
+		content: "";
+		position: absolute;
+		inset: -8px;
+	}
+
+	.infobar {
+		border-left: 0;
+		border-right: 0;
+		padding: 6px 8px;
+		font-size: 12px;
+	}
+
+	.window-body {
+		border: 0;
+		box-shadow: none;
+		padding-bottom: env(safe-area-inset-bottom);
+	}
+
+	.files {
+		display: grid;
+		grid-template-columns: repeat(3, minmax(0, 1fr));
+		gap: 12px 6px;
+		padding: 18px 10px;
+	}
+
+	.wp-desk {
+		padding: 8px 6px 16px;
+	}
+
+	.doc--page {
+		min-height: 0;
+		padding: 24px 20px 36px;
+		font-size: 18px;
+	}
+
+	.mail-panes {
+		padding: 0;
+	}
+
+	.pdf-view {
+		display: none;
+	}
+
+	.pdf-phone {
+		display: block;
+		font-size: 16px;
+	}
+
+	.pdf-body {
+		margin: 0;
+		border-width: 1px 0 0;
+		box-shadow: none;
+	}
+
+	.window--pdf .window-body {
+		min-height: 70vh;
+	}
+
+	.pdf-bar {
+		padding: 8px;
+	}
+
+	.pdf-bar .button {
+		padding: 10px 14px;
+	}
+
+	.pdf-name {
+		font-size: 13px;
+	}
+
+	.mail-head {
+		padding: 10px 12px;
+		font-size: 14px;
+	}
+
+	.mail-body {
+		border-width: 1px 0 0;
+		box-shadow: none;
+	}
+
+	.doc--mail {
+		font-size: 15px;
+	}
+
+	.notes-pane .doc {
+		padding: 18px 16px 36px;
+		font-size: 16px;
+	}
+
+	/* Small windows sit in the middle instead of filling the screen. */
+	.window--alert,
+	.window--app,
+	.window--alert.is-placed,
+	.window--app.is-placed {
+		left: 50% !important;
+		top: 6% !important;
+		width: min(360px, calc(100% - 12px)) !important;
+		height: auto !important;
+		max-height: 92%;
+		transform: translateX(-50%);
+		padding: 0 5px 5px;
+		border: 1px solid var(--ink);
+		box-shadow: inset 1px 1px 0 var(--plat-hi), inset -1px -1px 0 var(--plat-dim), 1px 1px 0 var(--ink);
+	}
+
+	.window--alert .titlebar,
+	.window--app .titlebar {
+		border-bottom: 0;
+		padding: 0 4px;
+	}
+
+	.windows:has(.window--alert.is-active, .window--app.is-active) {
+		background: rgba(0, 0, 0, 0.3);
+	}
+
+	.window[data-app="terminal"],
+	.window[data-app="terminal"].is-placed,
+	.window[data-app="paint"],
+	.window[data-app="paint"].is-placed {
+		top: 0 !important;
+		width: 100% !important;
+		height: 72% !important;
+	}
+
+	.window[data-app="terminal"] .window-body,
+	.window[data-app="player"] .window-body {
+		border: 1px solid var(--ink);
+	}
+
+	.terminal {
+		font-size: 16px;
+	}
+
+	.startup-word {
+		font-size: 56px;
+	}
+
+	.startup-brand .ico {
+		width: 56px;
+		height: 56px;
+	}
+
+	.startup-icons {
+		flex-wrap: wrap;
+	}
+
+	.about {
+		width: auto;
+	}
+
+	.about-word {
+		font-size: 46px;
+	}
+
+	.about-bar {
+		width: 80px;
+	}
+
+	.button {
+		min-height: 44px;
+		padding: 10px 16px;
+		font-size: 15px;
+	}
+
+	.alert-body,
+	.app-pad,
+	.mines {
+		font-size: 15px;
+	}
+
+	.swatches {
+		grid-template-columns: repeat(3, minmax(0, 1fr));
+	}
+
+	.swatch {
+		height: 56px;
+	}
+
+	.puzzle-board {
+		grid-template-columns: repeat(4, 60px);
+		grid-auto-rows: 60px;
+	}
+
+	.tile {
+		font-size: 20px;
+	}
+
+	.chip {
+		width: 34px;
+		height: 34px;
+	}
+
+	.mines-grid {
+		--cell: 34px;
+	}
+
+	.mines-level {
+		display: none;
+	}
+
+	.mines-status {
+		max-width: none;
+	}
+
+	.window[data-app="solitaire"],
+	.window[data-app="solitaire"].is-placed {
+		top: 0 !important;
+		width: 100% !important;
+	}
+
+	.sol {
+		padding: 6px 2px 8px;
+		font-size: 15px;
+	}
+
+	.sol-board {
+		width: auto;
+		padding: 6px;
+	}
+
+	.sol-top,
+	.sol-tab {
+		gap: 4px;
+	}
+
+	.cell {
+		font-size: 17px;
+	}
+
+	.player {
+		width: auto;
+	}
+
+	.player-key {
+		width: 44px;
+		height: 44px;
+	}
+
+	.player-key--play {
+		width: 52px;
+		height: 52px;
+	}
+
+	.player-vol input {
+		width: 54px;
+	}
+
+	.player-out {
+		width: 36px;
+		height: 36px;
+	}
+
+	.player-bar {
+		height: 24px;
+	}
+
+	.player-bar::before,
+	.player-bar i {
+		top: 11px;
+	}
+
+	.player-bar b {
+		top: 6px;
+	}
+
+	.player-item {
+		padding: 11px 8px;
+		font-size: 14px;
+	}
+
+	.player-x {
+		width: 44px;
+		font-size: 18px;
+	}
+
+	.player-add {
+		flex-wrap: wrap;
+	}
+
+	.player-add input {
+		flex: 1 1 100%;
+		padding: 9px 8px;
+		font-size: 16px;
+	}
+
+	.player-add .button {
+		flex: 1 1 100%;
+	}
+
+	/* Notes: the list first, then one note with a way back. */
+	.notes {
+		display: block;
+	}
+
+	.notes-list {
+		border-right: 0;
+		min-height: 100%;
+	}
+
+	.notes-list a {
+		padding: 14px 16px;
+		font-size: 15px;
+	}
+
+	.notes-list time {
+		font-size: 13px;
+	}
+
+	.notes.has-note .notes-list,
+	.notes:not(.has-note) .notes-pane:has(.notes-hint) {
+		display: none;
+	}
+
+	.notes-back {
+		display: block;
+		padding: 14px 16px;
+		border-bottom: 1px solid var(--plat-lo);
+		background: var(--plat);
+		font: 700 14px/1.2 var(--chrome-font);
+		text-decoration: none;
+	}
+
+	.notes-back::before {
+		content: "\25C0\00A0";
+	}
+}

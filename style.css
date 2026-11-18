@@ -1,0 +1,15 @@
+/*
+Theme Name: Retro Desktop
+Theme URI: https://github.com/celestinetan/retro-desktop-theme
+Author: Celestine Tan
+Author URI: https://celestinetan.com
+Description: A personal site drawn as a late-1990s desktop, with a menu bar, control strip and striped windows. Portfolio project types become folders, projects become files, pages become documents and blog posts become notes. All content is edited in WordPress; the theme only displays it.
+Version: 1.0.0
+Requires at least: 6.4
+Requires PHP: 7.4
+License: MIT
+License URI: https://opensource.org/license/mit
+Text Domain: platinum
+*/
+
+/* The real styles live in assets/css/platinum.css and assets/css/mobile.css. */
