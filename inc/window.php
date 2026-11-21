@@ -111,19 +111,59 @@ function platinum_folder_window() {
 	global $wp_query;
 	$term = get_queried_object();
 
+	// Folders inside this one come first, in name order.
+	$inside = get_terms(
+		array(
+			'taxonomy'   => PLATINUM_TAX,
+			'hide_empty' => false,
+			'parent'     => (int) $term->term_id,
+			'orderby'    => 'name',
+			'order'      => 'ASC',
+		)
+	);
+	if ( is_wp_error( $inside ) ) {
+		$inside = array();
+	}
+
+	$info = platinum_count_label( count( $inside ) + (int) $wp_query->found_posts );
+	if ( $term->parent ) {
+		$up = get_term( (int) $term->parent, PLATINUM_TAX );
+		if ( $up && ! is_wp_error( $up ) ) {
+			$up_link = get_term_link( $up );
+			if ( ! is_wp_error( $up_link ) ) {
+				/* translators: 1: number of items, 2: the folder it sits in. */
+				$info = sprintf( esc_html__( '%1$s, in %2$s', 'platinum' ), $info, '<a href="' . esc_url( $up_link ) . '">' . esc_html( $up->name ) . '</a>' );
+			}
+		}
+	}
+
 	platinum_window_open(
 		'folder',
 		$term->name,
 		array(
 			'url'  => get_term_link( $term ),
-			'info' => platinum_count_label( (int) $wp_query->found_posts ),
+			'info' => $info,
 			'main' => true,
 			'term' => (int) $term->term_id,
 		)
 	);
 
-	if ( have_posts() ) {
+	if ( $inside || have_posts() ) {
 		echo '<div class="files">';
+		foreach ( $inside as $sub ) {
+			$sub_link = get_term_link( $sub );
+			if ( is_wp_error( $sub_link ) ) {
+				continue;
+			}
+			platinum_the_icon(
+				array(
+					'label' => $sub->name,
+					'icon'  => 'folder',
+					'url'   => $sub_link,
+					'attrs' => array( 'data-term' => (string) $sub->term_id ),
+				)
+			);
+		}
 		while ( have_posts() ) {
 			the_post();
 			$shortcut = platinum_shortcut();

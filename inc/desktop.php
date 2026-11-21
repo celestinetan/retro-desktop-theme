@@ -70,6 +70,57 @@ function platinum_folder_items() {
 }
 
 /**
+ * Every folder, each followed by the folders inside it, with its path
+ * ("Creative › Zines") and its parent. Used by the owner's tools.
+ *
+ * @return array List of id, name, path, parent.
+ */
+function platinum_folder_tree() {
+	$terms = get_terms(
+		array(
+			'taxonomy'   => PLATINUM_TAX,
+			'hide_empty' => false,
+			'orderby'    => 'name',
+			'order'      => 'ASC',
+		)
+	);
+	if ( is_wp_error( $terms ) ) {
+		return array();
+	}
+	$by_parent = array();
+	foreach ( $terms as $term ) {
+		$by_parent[ (int) $term->parent ][] = $term;
+	}
+	if ( isset( $by_parent[0] ) ) {
+		usort(
+			$by_parent[0],
+			function ( $a, $b ) {
+				return $a->term_id - $b->term_id; // Top level in the desktop's order.
+			}
+		);
+	}
+	$out  = array();
+	$walk = function ( $parent, $path ) use ( &$walk, &$out, $by_parent ) {
+		if ( empty( $by_parent[ $parent ] ) ) {
+			return;
+		}
+		foreach ( $by_parent[ $parent ] as $term ) {
+			$name  = $path ? $path . ' › ' . $term->name : $term->name;
+			$out[] = array(
+				'id'     => (int) $term->term_id,
+				'name'   => $name,
+				'parent' => (int) $term->parent,
+			);
+			if ( count( $out ) < 500 ) {
+				$walk( (int) $term->term_id, $name );
+			}
+		}
+	};
+	$walk( 0, '' );
+	return $out;
+}
+
+/**
  * Picks an icon for a page from its address.
  *
  * @param string $slug Page slug.
@@ -346,6 +397,10 @@ function platinum_shortcut_icon( $url ) {
 	$host = preg_replace( '#^www\.#', '', $host );
 	if ( in_array( $host, array( 'github.com', 'gitlab.com', 'codepen.io' ), true ) ) {
 		return 'code';
+	}
+	// Old software that plays in the browser, from the Internet Archive.
+	if ( 'archive.org' === $host && 0 === strpos( (string) wp_parse_url( $url, PHP_URL_PATH ), '/details/' ) ) {
+		return 'game';
 	}
 	return 'link';
 }

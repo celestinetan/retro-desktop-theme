@@ -76,7 +76,8 @@ Click it once to select it, then click its name and type the new one. Press Retu
 
 When you are logged in:
 
-- **New folder:** File > New Folder, type a name, Create. It appears on the desktop straight away.
+- **New folder:** File > New Folder, type a name, Create. It appears on the desktop straight away. With a folder window open in front, the new folder goes inside that folder instead.
+- **Folders inside folders:** drag a folder onto another folder (its icon or its open window) to put it inside. Drag a folder out of its window onto an empty part of the desktop to bring it back to the desktop. A folder window shows its subfolders first, and the line under its title says which folder it sits in (click that name to go up). In WordPress, the same thing is the "Parent" setting under Portfolio > Project Types. Moving folders works on a computer, not on a phone.
 - **Rename:** click a folder once to select it, then click its name (or choose File > Rename Folder). Type the new name and press Return. Escape cancels. The folder's web address keeps its original wording.
 - **Move a project:** open a folder, then drag a file onto another folder's icon or onto another open folder window.
 
@@ -101,7 +102,7 @@ A project that contains only one link to another site (and at most a short line 
 2. Give it a title, paste the link as the only content, and tick a folder.
 3. Publish.
 
-The icon is chosen from the address: a code file for GitHub, and a globe for anything else. A Featured image, if you set one, is used instead.
+The icon is chosen from the address: a code file for GitHub, a joystick for games on the Internet Archive (archive.org/details/…), and a globe for anything else. A Featured image, if you set one, is used instead.
 
 ## Add, rename or remove a folder
 

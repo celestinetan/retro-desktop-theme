@@ -1,6 +1,7 @@
 /**
- * Folders, for the site's owner only: make a new folder, rename one,
- * and drag projects from one folder into another.
+ * Folders, for the site's owner only: make a new folder (on the desktop or
+ * inside another folder), rename one, drag projects and folders into a folder,
+ * and drag a folder out of its window onto the desktop.
  *
  * A folder is a Portfolio project type in WordPress. Like write.js, this file is
  * only sent to someone who is logged in, and WordPress checks every change.
@@ -33,16 +34,27 @@
 
 	/* ---------- new folder ---------- */
 
+	// The folder window in front, if there is one: a new folder goes inside it.
+	function frontFolder() {
+		var front = P.activeWindow();
+		if (front && front.dataset.term) { return { term: front.dataset.term, name: front.querySelector('.title').textContent.trim() }; }
+		return null;
+	}
+
 	P.commands['new-folder'] = function () {
 		if (!allowed()) { return; }
+		var inside = frontFolder();
 		var box = field('Name', 'untitled folder');
 		var input = box.querySelector('input');
-		P.dialog('New Folder', 'Name the new folder. It appears on the desktop straight away.', [
+		var where = inside ? 'It goes inside “' + inside.name + '”.' : 'It appears on the desktop straight away.';
+		P.dialog('New Folder', 'Name the new folder. ' + where, [
 			{ label: 'Cancel' },
 			{ label: 'Create', primary: true, run: function () {
 				var name = input.value.trim();
 				if (!name) { return; }
-				P.api(cfg.folderKey, { method: 'POST', json: { name: name } })
+				var json = { name: name };
+				if (inside) { json.parent = parseInt(inside.term, 10); }
+				P.api(cfg.folderKey, { method: 'POST', json: json })
 					.then(function () { return P.refresh(); })
 					.catch(function (err) { refused('The folder could not be created.', err); });
 			} }
@@ -357,16 +369,70 @@
 		trashItems(items);
 	};
 
+	/* ---------- folders inside folders ---------- */
+
+	// Every folder inside this one, at any depth, from the list the page was given.
+	function within(term) {
+		var all = cfg.folders || [];
+		var found = [term];
+		for (var i = 0; i < found.length; i++) {
+			all.forEach(function (f) {
+				if (f.parent === found[i] && found.indexOf(f.id) === -1) { found.push(f.id); }
+			});
+		}
+		return found;
+	}
+
+	function parentOf(term) {
+		var match = (cfg.folders || []).filter(function (f) { return f.id === term; })[0];
+		return match ? match.parent : 0;
+	}
+
+	// Puts folders inside another folder (parent > 0) or back on the desktop (parent 0).
+	function moveFolders(icons, parent, name) {
+		if (!allowed()) { return true; }
+		var moving = icons.map(function (icon) { return parseInt(icon.dataset.term, 10); })
+			.filter(function (term) { return parentOf(term) !== parent; });
+		if (!moving.length) { return false; } // already there: just a move within the window
+		var loop = moving.filter(function (term) { return parent && within(term).indexOf(parent) !== -1; });
+		if (loop.length) {
+			P.alert('A folder cannot go inside itself, or inside a folder it holds.', 'Folders');
+			return true;
+		}
+		Promise.all(moving.map(function (term) {
+			return P.api(cfg.folderKey + '/' + term, { method: 'POST', json: { parent: parent } });
+		})).then(function () {
+			if (P.sound) { P.sound('drop'); }
+			return P.refresh();
+		}).catch(function (err) {
+			P.refresh();
+			refused('Not every folder could be moved to “' + name + '”.', err);
+		});
+		return true;
+	}
+
+	// Called by the desktop when icons are dragged out of a folder window and let go on the
+	// desktop itself. A folder comes out onto the desktop; files stay where they are.
+	P.dropOnDesktop = function (icons) {
+		var folders = icons.filter(function (icon) { return icon.dataset.term; });
+		if (!folders.length) { return false; }
+		return moveFolders(folders, 0, 'the desktop');
+	};
+
 	/* ---------- dropping projects on a folder ---------- */
 
 	// Called by the desktop when icons are let go over a folder. Returns true when it has dealt with them.
 	P.dropOnFolder = function (icons, target, fromWindow) {
 		if (target.trash) { return dropOnTrash(icons); }
 		var projects = icons.filter(function (icon) { return icon.dataset.id && icon.dataset.rest === cfg.projects; });
+		var folders = icons.filter(function (icon) { return icon.dataset.term; });
 		var others = icons.filter(function (icon) { return projects.indexOf(icon) === -1 && !icon.dataset.term; });
 
+		if (folders.length && !projects.length && !others.length) {
+			return moveFolders(folders, parseInt(target.term, 10), target.name);
+		}
 		if (!projects.length) {
-			if (!others.length) { return false; } // a folder dropped on a folder: just a move on the desktop
+			if (!others.length) { return false; }
 			var name = others[0].querySelector('.icon-label').textContent.trim();
 			P.alert('“' + name + '” cannot go into a folder. Folders hold projects; this is a desktop document. To put it in a folder, open it, copy the text into a new document and save that to the folder.', 'Folders');
 			return true;

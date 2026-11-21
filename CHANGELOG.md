@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.1.0 – 21 November 2026
+
+- Folders inside folders: a folder window shows its subfolders first, then its own files, with a link to the folder it sits in.
+- For the owner: File > New Folder inside the open folder, drag a folder into another, or drag it out onto the desktop.
+- Shortcuts to games on the Internet Archive get a joystick icon.
+
 ## 1.0.0 – 18 November 2026
 
 First public version.

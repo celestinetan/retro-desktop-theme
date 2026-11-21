@@ -13,7 +13,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'PLATINUM_VERSION', '1.0.0' );
+define( 'PLATINUM_VERSION', '1.1.0' );
 
 // The name of the system, shown on the start-up screen and in the About window.
 define( 'PLATINUM_OS', 'RetroOS' );
@@ -139,6 +139,23 @@ add_filter(
 /**
  * Folders show every project; Notes shows the latest thirty posts.
  */
+/*
+ * A folder lists only what is directly inside it; its subfolders show as folders.
+ */
+add_action(
+	'parse_tax_query',
+	function ( $query ) {
+		if ( is_admin() || ! $query->is_main_query() || empty( $query->tax_query->queries ) ) {
+			return;
+		}
+		foreach ( $query->tax_query->queries as $key => $clause ) {
+			if ( is_array( $clause ) && isset( $clause['taxonomy'] ) && PLATINUM_TAX === $clause['taxonomy'] ) {
+				$query->tax_query->queries[ $key ]['include_children'] = false;
+			}
+		}
+	}
+);
+
 add_action(
 	'pre_get_posts',
 	function ( $query ) {
@@ -215,24 +232,7 @@ add_action(
 		// What the word processor needs to save to this site. Printed for the writer only;
 		// WordPress still checks their permission on every save.
 		if ( platinum_can_write() ) {
-			$folders = array();
-			$terms   = get_terms(
-				array(
-					'taxonomy'   => PLATINUM_TAX,
-					'hide_empty' => false,
-					'parent'     => 0,
-					'orderby'    => 'term_id',
-					'order'      => 'ASC',
-				)
-			);
-			if ( ! is_wp_error( $terms ) ) {
-				foreach ( $terms as $term ) {
-					$folders[] = array(
-						'id'   => (int) $term->term_id,
-						'name' => $term->name,
-					);
-				}
-			}
+			$folders = platinum_folder_tree();
 			$data['rest']     = esc_url_raw( rest_url( 'wp/v2/' ) );
 			$data['nonce']    = wp_create_nonce( 'wp_rest' );
 			$data['admin']    = esc_url_raw( admin_url() );

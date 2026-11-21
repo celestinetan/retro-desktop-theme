@@ -740,6 +740,12 @@
 
 			var target = folderUnder(lastX, lastY, icons);
 			if (target && target.el !== win && Platinum.dropOnFolder && Platinum.dropOnFolder(icons, target, win)) { return; }
+			// Let go on the desktop itself, outside every window: a folder comes out onto the desktop.
+			if (!target && Platinum.dropOnDesktop) {
+				var under = document.elementsFromPoint(lastX, lastY);
+				var onWindow = under.some(function (el) { return el.closest && el.closest('.window, .menubar, .strip'); });
+				if (!onWindow && Platinum.dropOnDesktop(icons, win)) { return; }
+			}
 
 			// Otherwise, move them within their own window, if that is where they were let go.
 			var area = box.getBoundingClientRect();
